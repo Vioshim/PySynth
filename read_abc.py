@@ -139,17 +139,18 @@ def add_note(a, n):
 			song[-1][1] = 1. / l
 			next_half = True
 			continue
-		if not note and a[x] == '%':
-			return
-		if not note and a[x] == '(' and a[x+1].isdigit():
-			triplet = int(a[x+1])
-			tripfac = triptab[triplet]
-			try:
-				if a[x+2] == ':':
-					tripfac = float(triplet) / float(a[x+3])
-					if a[x+4] == ':':
-						triplet = int(a[x+5])
-			except: pass
+		if not note:
+			if a[x] == '%':
+				return
+			if a[x] == '(' and a[x + 1].isdigit():
+				triplet = int(a[x+1])
+				tripfac = triptab[triplet]
+				try:
+					if a[x+2] == ':':
+						tripfac = float(triplet) / float(a[x+3])
+						if a[x+4] == ':':
+							triplet = int(a[x+5])
+				except: pass
 		if not note and a[x] == '[':
 			chord = True
 			continue
@@ -163,10 +164,9 @@ def add_note(a, n):
 			if a[x+1] == '2':
 				only_first = False
 			continue
-		if not note and a[x] == ':':
-			if a[x+1] == ':' or a[x+1] == '|':
-				song = song + second_ver
-				second_ver, do_repeat = [], False
+		if not note and a[x] == ':' and a[x + 1] in [':', '|']:
+			song = song + second_ver
+			second_ver, do_repeat = [], False
 		if note and a[x] == '-':
 			tie_next = 2
 			continue
@@ -180,8 +180,7 @@ def add_note(a, n):
 			continue
 		if not note and a[x].isalpha():
 			note = a[x].lower()
-			if a[x].isupper(): oct = 4
-			else: oct = 5
+			oct = 4 if a[x].isupper() else 5
 			note_oct = "%s%u" % (note, oct)
 			if a[x-1] == '_':
 				for oct2 in range(9):
@@ -208,36 +207,36 @@ def add_note(a, n):
 		if note and a[x].isalpha() or a[x] == '[':
 			break
 
-	if note:
-		if triplet:
-			leng *= tripfac
-			triplet -= 1
-		if note[0].lower() == 'z' or note[0].lower() == 'x':
-			note = 'r'
-			song += [["%s" % note, leng]]
-			if not only_first:
-				second_ver += [["%s" % note, leng]]
+	if not note:
+		return 0
+	if triplet:
+		leng *= tripfac
+		triplet -= 1
+	if note[0].lower() in ['z', 'x']:
+		note = 'r'
+		song += [[f"{note}", leng]]
+		if not only_first:
+			second_ver += [[f"{note}", leng]]
+	else:
+		corr_note = piano[piano.index(note_oct) + measure_sharps_flats.get(note_oct, 0)]
+		corr_note = f"{corr_note}{firstnote}"
+		if tie_next == 1:
+			if corr_note == song[-1][0]:
+				song[-1][1] = 1. / (1./song[-1][1] + 1. / leng)
+				try:
+					second_ver[-1][1] = song[-1][1]
+				except: pass
+			tie_next = 0
 		else:
-			corr_note = piano[piano.index(note_oct) + measure_sharps_flats.get(note_oct, 0)]
-			corr_note = "%s%s" % (corr_note, firstnote)
-			if tie_next == 1:
-				if corr_note == song[-1][0]:
-					song[-1][1] = 1. / (1./song[-1][1] + 1. / leng)
-					try:
-						second_ver[-1][1] = song[-1][1]
-					except: pass
-				tie_next = 0
-			else:
-				song += [[corr_note, leng]]
-				if not only_first:
-					second_ver += [[corr_note, leng]]
-				if next_half:
-					leng = 1. / song[-1][1]
-					song[-1][1] = 1. / (.5 * leng)
-					next_half = False
-				if tie_next == 2: tie_next = 1
-		return x
-	else: return 0
+			song += [[corr_note, leng]]
+			if not only_first:
+				second_ver += [[corr_note, leng]]
+			if next_half:
+				leng = 1. / song[-1][1]
+				song[-1][1] = 1. / (.5 * leng)
+				next_half = False
+			if tie_next == 2: tie_next = 1
+	return x
 
 def parse_line(a):
 	global chord
@@ -253,10 +252,7 @@ def parse_line(a):
 		if not n: break
 
 def mk_triptab(m):
-	if int(m.split('/')[0]) % 2:
-		n = 3
-	else:
-		n = 2
+	n = 3 if int(m.split('/')[0]) % 2 else 2
 	return {2: 2./3., 3: 1.5, 4: 4./3., 5: 5./n, 6: 3., 7: 7./n, 8: 8./3., 9: 9./n}
 
 def get_bpm(s, u = "1/4"):

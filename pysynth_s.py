@@ -141,10 +141,7 @@ def make_wav(song,bpm=120,transpose=0,pause=0.,boost=1.1,repeat=0,fn="out.wav",s
 	ex_pos = 0.
 	t_len = 0
 	for y, x in song:
-		if x < 0:
-			t_len+=length(-2.*x/3.)
-		else:
-			t_len+=length(x)
+		t_len += length(-2.*x/3.) if x < 0 else length(x)
 	data = np.zeros(int((repeat+1)*t_len + 20 * 44100))
 	#print len(data)/44100., "s allocated"
 
@@ -164,11 +161,7 @@ def make_wav(song,bpm=120,transpose=0,pause=0.,boost=1.1,repeat=0,fn="out.wav",s
 				a=pitchhz[note]
 				kn = keynum[note]
 				a = a * 2**transpose
-				if x[1] < 0:
-					b=length(-2.*x[1]/3.)
-				else:
-					b=length(x[1])
-
+				b = length(-2.*x[1]/3.) if x[1] < 0 else length(x[1])
 				render2(a, b, vol, int(ex_pos), kn, note)
 				ex_pos = ex_pos + b
 

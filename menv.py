@@ -36,15 +36,11 @@ class mEnv:
 		''' Constructor class. '''
 
 		# Get the user input.
-		if sys.version >= '3':
-			cliInput = input(">>> ")
-		else:
-			cliInput = raw_input(">>> ")
-
+		cliInput = input(">>> ") if sys.version >= '3' else raw_input(">>> ")
 		self.parse(cliInput)
 
 		# Different cases of input, when optional argument 'sound' is given.
-		if self.instrument == 'a' or self.instrument == '':
+		if self.instrument in ['a', '']:
 			self.synthSounds(pysynth, self.outFile)
 		elif self.instrument == 'b':
 			self.synthSounds(pysynth_b, self.outFile)
@@ -94,7 +90,7 @@ class mEnv:
 						mEnv()
 				elif comp[0] == 'save':
 					try:
-						self.outFile = str(comp[1]) + '.wav'
+						self.outFile = f'{str(comp[1])}.wav'
 						self.trashFile = False
 					except IndexError:
 						print(warningStr)
@@ -168,5 +164,5 @@ if __name__ == "__main__":
 			a.trashFile = False
 			if a.outFile == '':
 				a.outFile = 'temp.wav'
-			print('Could not play file. Saved to ' + a.outFile)
+			print(f'Could not play file. Saved to {a.outFile}')
 		a.removeFile(a.outFile)
