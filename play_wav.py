@@ -38,7 +38,7 @@ class Sound:
 	def playFile(self, mediaFile, repeat = 0):
 		''' Play the .wav file.'''
 
-		for n in range(repeat + 1):
+		for _ in range(repeat + 1):
 			if pyaudioFound:
 				self.play_pyaudio(mediaFile)
 			elif tkSnackFound:
@@ -104,5 +104,5 @@ class Sound:
 				media_player = ""	# Empty string -> Enclosures get opened
 							# in default web browser.
 		if media_player:
-			command = '%s "%s"' % (media_player, mediaFile)
+			command = f'{media_player} "{mediaFile}"'
 			os.system(command)

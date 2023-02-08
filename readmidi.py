@@ -55,8 +55,8 @@ class Note(object):
 	def __str__(self):
 		s = Note.note_names[(self.pitch - 9) % 12]
 		s += str(self.pitch // 12 - 1)
-		s += " " + str(self.velocity)
-		s += " " + str(self.start) + " " + str(self.start + self.duration) + " "
+		s += f" {str(self.velocity)}"
+		s += f" {str(self.start)} {str(self.start + self.duration)} "
 		return s
 	
 	def get_end(self):
@@ -97,9 +97,7 @@ class MidiFile(object):
 
 			# Now to fill out the arrays with the notes
 			self.tracks = []
-			for i in range(0, self.track_count):
-				self.tracks.append([])
-
+			self.tracks.extend([] for _ in range(self.track_count))
 			for nn, track in enumerate(self.tracks):
 				abs_time = 0.
 
@@ -116,12 +114,11 @@ class MidiFile(object):
 					size -= 1
 					flag = self.read_byte(file)
 					# Sysex messages
-					if flag == 0xF0 or flag == 0xF7:
+					if flag in [0xF0, 0xF7]:
 						# print "Sysex"
 						while True:
 							size -= 1
 							if self.read_byte(file) == 0xF7: break
-					# Meta messages
 					elif flag == 0xFF:
 						size -= 1
 						type = self.read_byte(file)
@@ -129,7 +126,7 @@ class MidiFile(object):
 							self.read_byte(file)
 							size -= 1
 							break
-						print("Meta: " + str(type))
+						print(f"Meta: {str(type)}")
 						length, size = self.read_variable_length(file, size)
 						message = file.read(length)
 						# if type not in [0x0, 0x7, 0x20, 0x2F, 0x51, 0x54, 0x58, 0x59, 0x7F]:
@@ -138,11 +135,10 @@ class MidiFile(object):
 							# http://www.recordingblogs.com/sa/Wiki?topic=MIDI+Set+Tempo+meta+message
 							self.tempo = 6e7 / struct.unpack('>i', b'\x00' + message)[0]
 							print("tempo =", self.tempo, "bpm")
-					# MIDI messages
 					else:
 						if flag & 0x80:
-							type_and_channel = flag
 							size -= 1
+							type_and_channel = flag
 							param1 = self.read_byte(file)
 							last_flag = flag
 						else:
@@ -155,7 +151,7 @@ class MidiFile(object):
 							continue
 						size -= 1
 						param2 = self.read_byte(file)
-						
+
 						# detect MIDI ons and MIDI offs
 						if type == 0x9:
 							track.append(Note(channel, param1, param2, abs_time))
@@ -166,14 +162,14 @@ class MidiFile(object):
 									break
 
 		except Exception as e:
-			print("Cannot parse MIDI file: " + str(e))
+			print(f"Cannot parse MIDI file: {str(e)}")
 		finally:
 			file.close()
 	
 	def __str__(self):
 		s = ""
 		for i, track in enumerate(self.tracks):
-			s += "Track " + str(i+1) + "\n"
+			s += f"Track {str(i + 1)}" + "\n"
 			for note in track:
 				s += str(note) + "\n"
 		return s
@@ -202,16 +198,10 @@ if __name__ == "__main__":
 	notes = {}
 
 	def getnote(q):
-		for x in q.keys():
-			if q[x] >= 0:
-				return x
-		return None
+		return next((x for x in q.keys() if q[x] >= 0), None)
 
 	def gettotal():
-		t = 0
-		for x, y in song:
-			t += 4 / y
-		return t
+		return sum(4 / y for x, y in song)
 
 	for n in m.tracks[tracknum]:
 		print(n)

@@ -84,10 +84,7 @@ def make_wav(song,bpm=120,transpose=0,leg_stac=.9,boost=1.1,repeat=0,fn="out.wav
 
 	def getval(v):
 		a = struct.unpack('i', v + b'\x00')[0] / 256 - 32768
-		if a > 0:
-			a =  1 - a / 32768
-		else:
-			a = -1 - a / 32768
+		a = 1 - a / 32768 if a > 0 else -1 - a / 32768
 		return(a)
 
 	def render2(a, b, vol, pos, knum, note):
@@ -129,10 +126,7 @@ def make_wav(song,bpm=120,transpose=0,leg_stac=.9,boost=1.1,repeat=0,fn="out.wav
 	ex_pos = 0.
 	t_len = 0
 	for y, x in song:
-		if x < 0:
-			t_len+=length(-2.*x/3.)
-		else:
-			t_len+=length(x)
+		t_len += length(-2.*x/3.) if x < 0 else length(x)
 		if y[-1] == '*':
 			y = y[:-1]
 		if not y[-1].isdigit():
@@ -155,11 +149,7 @@ def make_wav(song,bpm=120,transpose=0,leg_stac=.9,boost=1.1,repeat=0,fn="out.wav
 				a=pitchhz[note]
 				kn = keynum[note]
 				a = a * 2**transpose
-				if x[1] < 0:
-					b=length(-2.*x[1]/3.)
-				else:
-					b=length(x[1])
-
+				b = length(-2.*x[1]/3.) if x[1] < 0 else length(x[1])
 				render2(a, b, vol, int(ex_pos), kn, note)
 				ex_pos = ex_pos + b
 

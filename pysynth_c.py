@@ -122,12 +122,9 @@ def make_wav(song,bpm=120,transpose=0,pause=.05,boost=1.1,repeat=0,fn="out.wav",
 				try:
 					a=pitchhz[note]
 				except:
-					a=pitchhz[note + '4']	# default to fourth octave
+					a = pitchhz[f'{note}4']
 				a = a * 2**transpose
-				if x[1] < 0:
-					b=length(-2.*x[1]/3.)
-				else:
-					b=length(x[1])
+				b = length(-2.*x[1]/3.) if x[1] < 0 else length(x[1])
 				ex_pos = ex_pos + b
 				curpos = curpos + render2(a,b,vol)
 

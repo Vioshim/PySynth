@@ -39,9 +39,8 @@ def mix_files(a, b, c, chann = 2, phase = -1.):
 		f3.writeframesraw(d3)
 	f3.close()
 
-if __name__ == '__main__':
-	if len(sys.argv) == 4:
-		a, b, c = sys.argv[1:]
-		print("Mixing %s and %s, output will be %s" % (a, b, c))
-		mix_files(a, b, c)
+if __name__ == '__main__' and len(sys.argv) == 4:
+	a, b, c = sys.argv[1:]
+	print(f"Mixing {a} and {b}, output will be {c}")
+	mix_files(a, b, c)
 

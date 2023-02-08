@@ -76,9 +76,7 @@ def linint(arr, x):
 harmtab = np.zeros((88, 20))
 
 for h in range(1, len(harmo[0])):
-	dat = []
-	for n in range(len(harmo)):
-		dat.append((float(harmo[n][0]), harmo[n][h]))
+	dat = [(float(harmo[n][0]), harmo[n][h]) for n in range(len(harmo))]
 	for h2 in range(88):
 		harmtab[h2,h] = linint(dat, h2+1)
 
@@ -191,10 +189,7 @@ def make_wav(song,bpm=120,transpose=0,leg_stac=.9,boost=1.1,repeat=0,fn="out.wav
 	ex_pos = 0.
 	t_len = 0
 	for y, x in song:
-		if x < 0:
-			t_len+=length(-2.*x/3.)
-		else:
-			t_len+=length(x)
+		t_len += length(-2.*x/3.) if x < 0 else length(x)
 		if y[-1] == '*':
 			y = y[:-1]
 		if not y[-1].isdigit():
@@ -220,11 +215,7 @@ def make_wav(song,bpm=120,transpose=0,leg_stac=.9,boost=1.1,repeat=0,fn="out.wav
 				a=pitchhz[note]
 				kn = keynum[note]
 				a = a * 2**transpose
-				if x[1] < 0:
-					b=length(-2.*x[1]/3.)
-				else:
-					b=length(x[1])
-
+				b = length(-2.*x[1]/3.) if x[1] < 0 else length(x[1])
 				render2(a, b, vol, int(ex_pos), kn, note)
 				ex_pos = ex_pos + b
 
