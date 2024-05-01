@@ -38,8 +38,6 @@ from typing import Iterable
 
 import numpy as np
 
-from .mkfreq import getfn, getfreq
-
 __all__ = ("make_wav",)
 
 # path to Salamander piano samples (http://freepats.zenvoid.org/Piano/acoustic-grand-piano.html),
@@ -74,6 +72,8 @@ if not os.path.exists(patchpath):
         os.remove(tar_file)
         shutil.rmtree(folder_name)
 
+
+from .mkfreq import getfn, getfreq
 
 pitchhz, keynum = getfreq()
 

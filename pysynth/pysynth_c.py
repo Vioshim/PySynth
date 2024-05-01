@@ -63,7 +63,7 @@ def make_wav(
     bpmfac = 120.0 / bpm
 
     def length(l: float):
-        return 2*rate / l * bpmfac
+        return 2 * rate / l * bpmfac
 
     def waves2(hz: float, l: float):
         a = rate / hz
