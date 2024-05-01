@@ -28,10 +28,9 @@
 # 5.33 = -8 = dotted eighth
 """
 
-from __future__ import division
-
 import struct
 import wave
+import os, shutil, tarfile
 from io import BytesIO
 from typing import Iterable
 
@@ -41,14 +40,45 @@ from demosongs import *
 from mixfiles import mix_files
 from mkfreq import getfn, getfreq
 
+
+# path to Salamander piano samples (http://freepats.zenvoid.org/Piano/acoustic-grand-piano.html),
+#       48 kHz version:
+patchpath = os.path.join(os.path.dirname(__file__), "48khz24bit/")
+
+if not os.path.exists(patchpath):
+
+    if __name__ != "__main__":
+        raise FileNotFoundError("Piano samples not found. Please run this file as a script.")
+
+    import requests
+
+    DOWNLOAD_URL = "https://freepats.zenvoid.org/Piano/SalamanderGrandPiano/SalamanderGrandPianoV3+20161209_48khz24bit.tar.xz"
+
+    tar_file = os.path.join(os.path.dirname(__file__), os.path.basename(DOWNLOAD_URL))
+
+    with requests.get(DOWNLOAD_URL, stream=True) as response:
+        with open(tar_file, "wb") as f:
+            shutil.copyfileobj(response.raw, f)
+        
+        with tarfile.open(tar_file, "r:xz") as tar:
+            tar.extractall(path=os.path.dirname(__file__))
+            extracted_folder = tar.getnames()[0]
+
+        folder_name = os.path.join(os.path.dirname(__file__), extracted_folder)
+        correct_folder_name = os.path.join(os.path.dirname(__file__), "48khz24bit")
+        shutil.move(os.path.join(folder_name, "48khz24bit"), correct_folder_name)
+        os.remove(tar_file)
+        shutil.rmtree(folder_name)
+
+
 pitchhz, keynum = getfreq()
 
 # get filenames for sample layer 10:
 fnames = getfn(10)
 
-# path to Salamander piano samples (http://freepats.zenvoid.org/Piano/acoustic-grand-piano.html),
-#       48 kHz version:
-patchpath = "48khz24bit/"
+# Preload all samples
+
+notes_cache: dict[str, np.ndarray] = {}
 
 
 ##########################################################################
@@ -89,8 +119,6 @@ def make_wav(
     f.setframerate(48000)
     f.setcomptype("NONE", "Not Compressed")
 
-    notes_cache: dict[str, np.ndarray] = {}
-
     bpmfac = 120.0 / bpm
 
     def length(l: float):
@@ -106,27 +134,21 @@ def make_wav(
 
     def render2(a, b, vol, pos, knum, note):
         snd_len = int(b)
-        if note not in notes_cache:
-            wf = wave.open(patchpath + fnames[knum][0], "rb")
-            wl = wf.getnframes()
-            wd = wf.readframes(wl)
-            new = np.zeros(wl // 6)
-
-            for x in range(wl // 6):
-                new[x] = getval(wd[6 * x : 6 * x + 3])
-
-            wf.close()
-            notes_cache[note] = new.copy()
-        else:
+        if note in notes_cache:
             new = notes_cache[note].copy()
+        else:
+            with wave.open(patchpath + fnames[knum][0], "rb") as wf:
+                wl = wf.getnframes()
+                wd = wf.readframes(wl)
+                notes_cache[note] = new = np.array([getval(wd[6 * x : 6 * x + 3]) for x in range(wl // 6)])
 
         f = fnames[knum][1]
         if f > 1:
-            f2 = int(len(new) / f)
-            new2 = np.zeros(f2)
-            for x in range(f2):
-                q = x * f - int(x * f)
-                new2[x] = (1 - q) * new[int(x * f)] + q * new[int(x * f) + 1]
+            x = np.arange(len(new) / f)
+            q = x * f - np.floor(x * f)
+            indices_floor = np.floor(x * f).astype(int)
+            indices_ceil = np.ceil(x * f).astype(int)
+            new2 = (1 - q) * new[indices_floor] + q * new[indices_ceil]
         else:
             new2 = new
         raw_note = len(new2)

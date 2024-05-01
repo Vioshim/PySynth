@@ -1,0 +1,7 @@
+build/
+48khz24bit/
+*.egg-info/
+.venv/
+.vscode/
+*.wav
+__pycache__/

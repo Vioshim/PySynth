@@ -36,13 +36,12 @@ def getfreq(pr: bool = False):
 
 
 # construct filenames for Salamander piano samples
-facs = np.array([1, 2 ** (1 / 12), 2 ** (2 / 12)])
-nam = np.array(["A", "C", "D#", "F#"])
-
+facs = np.exp2(np.arange(3) / 12)
+nam = ["A", "C", "D#", "F#"]
 
 def getfn(layer: int):
-    sampfn = {}
-    for k in range(88):
-        oct = (k + 9) // 12
-        sampfn[k] = "%s%uv%u.wav" % (nam[(k // 3) % 4], oct, layer), facs[k % 3]
-    return sampfn
+    return {
+        k: ("%s%uv%u.wav" % (nam[(k // 3) % 4], ((k + 9) // 12), layer), facs[k % 3])
+        for k in range(88)
+    }
+
