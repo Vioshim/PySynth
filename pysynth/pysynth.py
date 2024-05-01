@@ -74,6 +74,7 @@ import numpy as np
 def make_wav(
     song: Iterable[tuple[str, float]],
     bpm: float = 120.0,
+    rate: float = 44100,
     transpose: float = 0.0,
     leg_stac: float = 0.9,
     pause: float = 0.05,
@@ -85,17 +86,17 @@ def make_wav(
 
     f.setnchannels(1)
     f.setsampwidth(2)
-    f.setframerate(44100)
+    f.setframerate(rate)
     f.setcomptype("NONE", "Not Compressed")
 
     bpmfac = 120.0 / bpm
 
     def length(l: float):
-        return 88200.0 / l * bpmfac
+        return 2 * rate / l * bpmfac
 
     def waves2(hz: float, l: float):
-        a = 44100.0 / hz
-        b = float(l) / 44100.0 * hz
+        a = rate / hz
+        b = float(l) / rate * hz
         return a, round(b)
 
     def asin(x: float):

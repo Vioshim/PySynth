@@ -111,6 +111,7 @@ notes_cache: dict[str, np.ndarray] = {}
 def make_wav(
     song: Iterable[tuple[str, float]],
     bpm: float = 120.0,
+    rate: int = 48000,
     transpose: float = 0.0,
     leg_stac: float = 0.9,
     pause: float = 0.05,
@@ -121,13 +122,13 @@ def make_wav(
     f = wave.open(fn, "w")
     f.setnchannels(1)
     f.setsampwidth(2)
-    f.setframerate(48000)
+    f.setframerate(rate)
     f.setcomptype("NONE", "Not Compressed")
 
     bpmfac = 120.0 / bpm
 
     def length(l: float):
-        return 96000.0 / l * bpmfac
+        return 2 * rate / l * bpmfac
 
     def getval(v: bytes):
         a = struct.unpack("i", v + b"\x00")[0] / 256 - 32768
@@ -173,7 +174,7 @@ def make_wav(
             t_len += length(-2.0 * x / 3.0)
         else:
             t_len += length(x)
-    data = np.zeros(int((repeat + 1) * t_len + 480000))
+    data = np.zeros(int((repeat + 1) * t_len + 10 * rate))
 
     for x, y in np.tile(song, (repeat + 1, 1)):  # type: ignore
         y = float(y)
@@ -203,7 +204,7 @@ def make_wav(
         ex_pos += b
 
     data /= data.max() * 2.0
-    out_len = int(2.0 * 48000.0 + ex_pos + 0.5)
+    out_len = int(2.0 * rate + ex_pos + 0.5)
     data2 = np.zeros(out_len, np.short)
     data2[:] = 32767.0 * data[:out_len]
     f.writeframes(data2.tobytes())

@@ -118,6 +118,7 @@ harm_max = 5.0
 def make_wav(
     song: Iterable[tuple[str, float]],
     bpm: float = 120.0,
+    rate: int = 44100,
     transpose: float = 0.0,
     leg_stac: float = 0.9,
     pause: float = 0.05,
@@ -133,26 +134,26 @@ def make_wav(
 
     f.setnchannels(1)
     f.setsampwidth(2)
-    f.setframerate(44100)
+    f.setframerate(rate)
     f.setcomptype("NONE", "Not Compressed")
 
     bpmfac = 120.0 / bpm
 
     def length(l: float):
-        return 88200.0 / l * bpmfac
+        return 2 * rate / l * bpmfac
 
     def waves2(hz: float, l: float):
-        a = 44100.0 / hz
-        b = float(l) / 44100.0 * hz
+        a = rate / hz
+        b = float(l) / rate * hz
         return a, round(b)
 
     def render2(a, b, vol, pos, knum, note):
         l = waves2(a, b)
         q = int(l[0] * l[1])
         lf = np.log(a)
-        snd_len = max(int(3.1 * q), 44100)
+        snd_len = max(int(3.1 * q), rate)
 
-        raw_note = 12 * 44100
+        raw_note = 12 * rate
         if note not in list(note_cache.keys()):
             x2 = np.arange(raw_note)
             sina = 2.0 * np.pi * x2 / float(l[0])
@@ -168,7 +169,7 @@ def make_wav(
                 + amp_3to6 * np.sin(sina + 0.89 * amp_3to6 * np.sin(sina))
                 + amp_3to6 * np.sin(sina + 0.79 * amp_3to6 * np.sin(sina))
             )
-            new *= np.exp(-x2 / decay[int(lf * 100)] / 44100.0)
+            new *= np.exp(-x2 / decay[int(lf * 100)] / rate)
             if cache_this[note] > 1:
                 note_cache[note] = new.copy()
         else:
@@ -192,7 +193,7 @@ def make_wav(
             y += "4"
         cache_this[y] = cache_this.get(y, 0) + 1
     # print "Note frequencies in song:", cache_this
-    data = np.zeros(int((repeat + 1) * t_len + 441000))
+    data = np.zeros(int((repeat + 1) * t_len + 10 * rate))
     # print len(data)/44100., "s allocated"
 
     for x, y in np.tile(song, (repeat + 1, 1)):  # type: ignore
@@ -221,7 +222,7 @@ def make_wav(
         ex_pos += b
 
     data /= data.max() * 2.0
-    out_len = int(2.0 * 44100.0 + ex_pos + 0.5)
+    out_len = int(2.0 * rate + ex_pos + 0.5)
     data2 = np.zeros(out_len, np.short)
     data2[:] = 32767.0 * data[:out_len]
     f.writeframes(data2.tobytes())
