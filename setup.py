@@ -1,6 +1,26 @@
 #!/usr/bin/env python
 
+import os
+import subprocess
+import shutil
 from setuptools import setup
+from setuptools.command.install import install
+
+class CustomInstall(install):
+    def run(self):
+        install.run(self)
+        self.download_and_extract()
+
+    def download_and_extract(self):
+        download_url = "https://freepats.zenvoid.org/Piano/SalamanderGrandPiano/SalamanderGrandPianoV3+20161209_48khz24bit.tar.xz"
+        tar_file = os.path.join(os.getcwd(), "SalamanderGrandPianoV3+20161209_48khz24bit.tar.xz")
+        subprocess.run(["wget", download_url, "-O", tar_file])
+        subprocess.run(["tar", "-xf", tar_file])
+        extracted_folder = "SalamanderGrandPianoV3_48khz24bit"
+        source_folder = os.path.join(extracted_folder, "48khz24bit")
+        target_folder = os.path.join(os.getcwd(), "48khz24bit")
+        shutil.move(source_folder, target_folder)
+
 
 setup(
     name="PySynth",
@@ -32,5 +52,5 @@ setup(
         "menv.py",
     ],
     requires=["numpy"],
-    package_data={"": ["48khz24bit/*"]},
+    cmdclass={"install": CustomInstall},
 )
