@@ -1,6 +1,5 @@
 import os
 import shutil
-import requests
 import tarfile
 from setuptools import setup
 from setuptools.command.install import install
@@ -23,6 +22,8 @@ class CustomInstall(install):
         tar_file = os.path.join(self.build_lib, os.path.basename(self.DOWNLOAD_URL))
         
         # Download the file
+        import requests
+
         with requests.get(self.DOWNLOAD_URL, stream=True) as response:
             with open(tar_file, "wb") as f:
                 shutil.copyfileobj(response.raw, f)
@@ -66,6 +67,6 @@ setup(
         "test_nokiacomposer2wav.py",
         "menv.py",
     ],
-    requires=["numpy"],
+    requires=["numpy", "requests"],
     cmdclass={"install": CustomInstall},
 )
