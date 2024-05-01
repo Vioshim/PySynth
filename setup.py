@@ -16,6 +16,10 @@ class CustomInstall(install):
 
     def download_and_extract(self):
         """Download and extract the tar file."""
+
+        if os.path.exists(os.path.join(self.build_lib, "48khz24bit")):
+            return
+
         tar_file = os.path.join(self.build_lib, os.path.basename(self.DOWNLOAD_URL))
         
         # Download the file
