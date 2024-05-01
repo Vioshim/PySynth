@@ -1,26 +1,37 @@
-#!/usr/bin/env python
-
 import os
-import subprocess
 import shutil
+import requests
+import tarfile
 from setuptools import setup
 from setuptools.command.install import install
 
 class CustomInstall(install):
+    """Custom installation class."""
+    DOWNLOAD_URL = "https://freepats.zenvoid.org/Piano/SalamanderGrandPiano/SalamanderGrandPianoV3+20161209_48khz24bit.tar.xz"
+    
     def run(self):
+        """Override default run method."""
         install.run(self)
         self.download_and_extract()
 
     def download_and_extract(self):
-        download_url = "https://freepats.zenvoid.org/Piano/SalamanderGrandPiano/SalamanderGrandPianoV3+20161209_48khz24bit.tar.xz"
-        tar_file = os.path.join(os.getcwd(), "SalamanderGrandPianoV3+20161209_48khz24bit.tar.xz")
-        subprocess.run(["wget", download_url, "-O", tar_file])
-        subprocess.run(["tar", "-xf", tar_file])
-        extracted_folder = "SalamanderGrandPianoV3_48khz24bit"
-        source_folder = os.path.join(extracted_folder, "48khz24bit")
-        target_folder = os.path.join(os.getcwd(), "48khz24bit")
-        shutil.move(source_folder, target_folder)
+        """Download and extract the tar file."""
+        tar_file = os.path.join(self.build_lib, os.path.basename(self.DOWNLOAD_URL))
+        
+        # Download the file
+        with requests.get(self.DOWNLOAD_URL, stream=True) as response:
+            with open(tar_file, "wb") as f:
+                shutil.copyfileobj(response.raw, f)
 
+        with tarfile.open(tar_file, "r:xz") as tar:
+            tar.extractall(path=self.build_lib)
+            extracted_folder = tar.getnames()[0]
+
+        folder_name = os.path.join(self.build_lib, extracted_folder)
+        correct_folder_name = os.path.join(self.build_lib, "48khz24bit")
+        shutil.move(os.path.join(folder_name, "48khz24bit"), correct_folder_name)
+        os.remove(tar_file)
+        shutil.rmtree(folder_name)
 
 setup(
     name="PySynth",
