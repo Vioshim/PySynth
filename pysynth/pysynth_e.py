@@ -120,6 +120,7 @@ def make_wav(
     bpm: float = 120.0,
     transpose: float = 0.0,
     leg_stac: float = 0.9,
+    pause: float = 0.05,
     boost: float = 1.0,
     repeat: int = 0,
     fn: str | BytesIO = "out.wav",
