@@ -125,6 +125,7 @@ def make_wav(
     boost: float = 1.0,
     repeat: int = 0,
     fn: str | BytesIO = "out.wav",
+    closing: bool = True,
 ):
     data = []
     note_cache = {}
@@ -226,7 +227,8 @@ def make_wav(
     data2 = np.zeros(out_len, np.short)
     data2[:] = 32767.0 * data[:out_len]
     f.writeframes(data2.tobytes())
-    f.close()
+    if closing:
+        f.close()
 
 
 ##########################################################################

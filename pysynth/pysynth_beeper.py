@@ -31,6 +31,7 @@ def make_wav(
     boost: float = 1.0,
     repeat: int = 0,
     fn: str | BytesIO = "out.wav",
+    closing: bool = True,
 ):
     # def make_wav(song, tempo=120, transpose=0, fn="out.wav"):
     f = wave.open(fn, "w")
@@ -124,7 +125,8 @@ def make_wav(
             freq *= np.exp2(transpose)
             beep(freq, duration, f, volume)
 
-    f.close()
+    if closing:
+        f.close()
 
 
 if __name__ == "__main__":

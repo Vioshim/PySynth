@@ -51,6 +51,7 @@ def make_wav(
     boost: float = 1.0,
     repeat: int = 0,
     fn: str | BytesIO = "out.wav",
+    closing: bool = True,
 ):
     f = wave.open(fn, "w")
 
@@ -111,7 +112,8 @@ def make_wav(
             f.writeframesraw((wave_samples * 32767).astype(np.int16).tobytes())
 
     f.writeframes(b"")
-    f.close()
+    if closing:
+        f.close()
 
 
 if __name__ == "__main__":
