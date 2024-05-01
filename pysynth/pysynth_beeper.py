@@ -9,9 +9,13 @@ import numpy as np
 __all__ = ("make_wav",)
 
 keys_s = ("a", "a#", "b", "c", "c#", "d", "d#", "e", "f", "f#", "g", "g#")
-PITCHHZ = {
-    f"{keys_s[k % 12]}{(k + 9) // 12}": 27.5 * np.exp2(k / 12.0) for k in range(88)
-}
+PITCHHZ = {}
+
+for k in range(88):
+    freq = 27.5 * 2.0 ** (k / 12.0)
+    oct = (k + 9) // 12
+    note = "%s%u" % (keys_s[k % 12], oct)
+    PITCHHZ[note] = freq
 # Format:  [(start, end, start_level, end_level), ...]
 waveform = [
     (0.0, 0.3, 1.0, -1.0),
@@ -56,10 +60,11 @@ def make_wav(
 
     def beep_single_period(period, volume: float = 1.0):
         period_waveform = []
+        asin = lambda x: np.sin(2.0 * np.pi * x)
+
         for x in range(period):
             # Position inside current period, 0..1
             pos = float(x) / period
-            asin = lambda x: np.sin(2.0 * np.pi * x)
 
             # Synth 1, using sine waves
             level1 = (asin(pos) + asin(pos * 2)) / 2
@@ -77,7 +82,7 @@ def make_wav(
             period_waveform.append(level * volume)
             # period_waveform_packed.append(sixteenbit(level))
 
-        return period_waveform, b"".join(sixteenbit(l) for l in period_waveform)
+        return period_waveform, b"".join(map(sixteenbit, period_waveform))
 
     def beep(freq, duration, sink, volume):
         ow = b""
