@@ -34,8 +34,9 @@ from typing import Iterable
 
 import numpy as np
 
-from demosongs import song3
-from mkfreq import getfreq
+from .mkfreq import getfreq
+
+__all__ = ("make_wav",)
 
 pitchhz, keynum = getfreq()
 
@@ -112,5 +113,6 @@ def make_wav(
 
 
 if __name__ == "__main__":
-    # SONG
+    from .demosongs import song3
+
     make_wav(song3, bpm=132 / 2, pause=0.0, boost=1.1, fn="pysynth_chopin.wav")

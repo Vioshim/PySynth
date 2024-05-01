@@ -40,6 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import struct
 
+__all__ = "MidiFile", "Note", "getdur"
+
 
 class Note(object):
     "Represents a single MIDI note"

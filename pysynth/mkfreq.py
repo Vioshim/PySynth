@@ -4,6 +4,8 @@
 
 import numpy as np
 
+__all__ = ("getfreq", "getfn")
+
 keys_s = np.array(["a", "a#", "b", "c", "c#", "d", "d#", "e", "f", "f#", "g", "g#"])
 keys_f = np.array(["a", "bb", "b", "c", "db", "d", "eb", "e", "f", "gb", "g", "ab"])
 keys_e = np.array(["a", "bb", "cb", "b#", "db", "d", "eb", "fb", "e#", "gb", "g", "ab"])
@@ -39,9 +41,9 @@ def getfreq(pr: bool = False):
 facs = np.exp2(np.arange(3) / 12)
 nam = ["A", "C", "D#", "F#"]
 
+
 def getfn(layer: int):
     return {
         k: ("%s%uv%u.wav" % (nam[(k // 3) % 4], ((k + 9) // 12), layer), facs[k % 3])
         for k in range(88)
     }
-

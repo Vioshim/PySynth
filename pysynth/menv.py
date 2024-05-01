@@ -10,10 +10,7 @@ import string
 import sys
 import wave
 
-import play_wav
-import pysynth
-import pysynth_b
-import pysynth_s
+from . import play_wav, pysynth, pysynth_b, pysynth_s
 
 # Type 'help' to access.
 helpContent = "------------------------------\nPySynth musical note interpreter.\nUsage: <Duration><Note> <Duration2><Note2> .... <DurationN><NoteN>\nOptional arguments:\n\t--bpm=Beats per minute [Default:120]\n\t--repeat=Number of bars [Default:1]\n\t--sound=Instrument [a = Flute/Organ, b = piano, s = plucked string, Default = a]\n\t--save=filename (Filename to save the file to. Appends .wav to filename)\nSamples:\n8g 8g 8g 2eb 8r 8f 8f 8f 1d --sound=a\n4e4 4e4 4f4 4g4 4g4 4f4 4e4 4d4 4c4 4c4 4d4 4e4 4e4 4d4 2d4 4e4 4e4 4f4 4g4 4g4 4f4 4e4 4d4 4c4 4c4 4d4 4e4 4d4 4c4 2c4 --bpm=200 --repeat=1 --sound=s --save=Ode_to_Joy\nCommands: 'exit' and 'help'\n------------------------------"

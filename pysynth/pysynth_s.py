@@ -36,9 +36,9 @@ from typing import Iterable
 
 import numpy as np
 
-from demosongs import *
-from mixfiles import mix_files
-from mkfreq import getfreq
+from .mkfreq import getfreq
+
+__all__ = ("make_wav",)
 
 pitchhz, keynum = getfreq()
 
@@ -179,6 +179,9 @@ def make_wav(
 ##########################################################################
 
 if __name__ == "__main__":
+    from .demosongs import *
+    from .mixfiles import mix_files
+
     print("*** KARPLUS-STRONG STRING ***")
     print()
     print("Creating Demo Songs... (this might take a few minutes)")

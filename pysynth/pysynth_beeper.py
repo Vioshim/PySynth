@@ -6,6 +6,8 @@ from typing import Iterable
 
 import numpy as np
 
+__all__ = ("make_wav",)
+
 keys_s = ("a", "a#", "b", "c", "c#", "d", "d#", "e", "f", "f#", "g", "g#")
 PITCHHZ = {
     f"{keys_s[k % 12]}{(k + 9) // 12}": 27.5 * np.exp2(k / 12.0) for k in range(88)

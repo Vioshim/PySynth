@@ -1,6 +1,10 @@
 # coding=utf-8
 
 # Example 1: The C major scale
+
+__all__ = ("song1", "song2", "song3", "song4_rh", "song4_lh")
+
+
 song1 = [
     ("c", 4),
     ("d", 4),

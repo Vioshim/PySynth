@@ -33,21 +33,21 @@ except:
 song = []
 
 if "--syn_b" in sys.argv:
-    import pysynth_b as pysynth
+    from . import pysynth_b as pysynth
 elif "--syn_s" in sys.argv:
-    import pysynth_s as pysynth
+    from . import pysynth_s as pysynth
 elif "--syn_e" in sys.argv:
-    import pysynth_e as pysynth
+    from . import pysynth_e as pysynth
 elif "--syn_c" in sys.argv:
-    import pysynth_c as pysynth
+    from . import pysynth_c as pysynth
 elif "--syn_d" in sys.argv:
-    import pysynth_d as pysynth
+    from . import pysynth_d as pysynth
 elif "--syn_p" in sys.argv:
-    import pysynth_p as pysynth
+    from . import pysynth_p as pysynth
 elif "--syn_samp" in sys.argv:
-    import pysynth_samp as pysynth
+    from . import pysynth_samp as pysynth
 else:
-    import pysynth
+    from . import pysynth
 
 
 # flatten or sharpen notes according to key signature

@@ -31,8 +31,9 @@
 from io import BytesIO
 from typing import Iterable
 
-from demosongs import *
-from mkfreq import getfreq
+from .mkfreq import getfreq
+
+__all__ = ("make_wav",)
 
 pitchhz, keynum = getfreq(pr=True)
 
@@ -180,7 +181,8 @@ def make_wav(
 
 
 if __name__ == "__main__":
-    from mixfiles import mix_files
+    from .demosongs import *
+    from .mixfiles import mix_files
 
     print()
     print("Creating Demo Songs... (this might take about a minute)")

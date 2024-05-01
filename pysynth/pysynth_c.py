@@ -34,8 +34,10 @@ from typing import Iterable
 
 import numpy as np
 
-from demosongs import song3
-from mkfreq import getfreq
+from .demosongs import song3
+from .mkfreq import getfreq
+
+__all__ = ("make_wav",)
 
 pitchhz, keynum = getfreq()
 
@@ -64,33 +66,33 @@ def make_wav(
     def waves2(hz: float, l: float):
         a = 44100.0 / hz
         b = float(l) / 44100.0 * hz
-        return a, round(b)
+        return [a, round(b)]
 
     def render2(a: float, b: float, vol: float):
         b2 = (1.0 - pause) * b
         l = waves2(a, b2)
         q = int(l[0] * l[1])
 
+        oscstep = 2.0 / l[0]
         fade_array = np.linspace(1, 0, num=q)
         osc, sp, fade = -1, 0, 1
-        halfp = l[0] / 2.0
 
         for x in range(q):
-            osc = 1 if (x // halfp) % 2 else -1
             if q - x < 100:
                 fade = fade_array[q - x - 1]
             sp += (osc - sp) / 100
-            yield 0.5 * fade * vol * sp
+            yield fade * vol * sp
+            osc += oscstep
+            if osc > 1:
+                osc = -1
 
-    curpos, ex_pos = 0, 0.0
-    for x, y in np.tile(song, (repeat + 1, 1)):  # type: ignore
+    # Keep as list[tuple[str, float]]
+    for x, y in np.tile(song, repeat + 1):  # type: ignore
         y = float(y)
 
         if x == "r":
             b = length(y)
-            ex_pos += b
             f.writeframesraw(b"\x00\x00" * int(b))  # Zero padding for rest
-            curpos += int(b)
             continue
 
         if x[-1] == "*":
@@ -104,15 +106,14 @@ def make_wav(
             a = pitchhz[note + "4"]  # default to fourth octave
 
         a *= np.exp2(transpose)
+
         if y < 0:
             b = length(-2.0 * y / 3.0)
         else:
             b = length(y)
 
-        ex_pos = ex_pos + b
         wave_samples = np.array(list(render2(a, b, vol)))
         f.writeframesraw((wave_samples * 32767).astype(np.int16).tobytes())
-        curpos += len(wave_samples)
 
     f.writeframes(b"")
     f.close()

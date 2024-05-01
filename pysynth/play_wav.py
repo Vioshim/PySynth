@@ -10,6 +10,8 @@ import string
 import sys
 import wave
 
+__all__ = ("Sound",)
+
 pyaudioFound = False
 tkSnackFound = False
 pygletFound = False

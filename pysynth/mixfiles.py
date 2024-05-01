@@ -7,6 +7,8 @@ import sys
 import wave
 from io import BytesIO
 
+__all__ = ("mix_files", "append_files")
+
 
 def mix_files(a, b, c, chann=2, phase=-1.0):
     f1 = wave.open(a, "r")

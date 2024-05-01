@@ -1,9 +1,9 @@
 import logging
 import re
 
-import pysynth_beeper
+from . import pysynth_beeper
 
-LOG = logging.getLogger("nokiacomposer2wav")
+__all__ = ("parse_ringtone",)
 
 
 def parse_ringtone(tune_str):
@@ -22,6 +22,7 @@ if __name__ == "__main__":
     import os
     import sys
 
+    LOG = logging.getLogger("nokiacomposer2wav")
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
     data = []

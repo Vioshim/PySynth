@@ -28,27 +28,31 @@
 # 5.33 = -8 = dotted eighth
 """
 
+import os
+import shutil
 import struct
+import tarfile
 import wave
-import os, shutil, tarfile
 from io import BytesIO
 from typing import Iterable
 
 import numpy as np
 
-from demosongs import *
-from mixfiles import mix_files
-from mkfreq import getfn, getfreq
+from .mkfreq import getfn, getfreq
 
+__all__ = ("make_wav",)
 
 # path to Salamander piano samples (http://freepats.zenvoid.org/Piano/acoustic-grand-piano.html),
 #       48 kHz version:
+
 patchpath = os.path.join(os.path.dirname(__file__), "48khz24bit/")
 
 if not os.path.exists(patchpath):
 
     if __name__ != "__main__":
-        raise FileNotFoundError("Piano samples not found. Please run this file as a script.")
+        raise FileNotFoundError(
+            "Piano samples not found. Please run this file as a script."
+        )
 
     import requests
 
@@ -59,7 +63,7 @@ if not os.path.exists(patchpath):
     with requests.get(DOWNLOAD_URL, stream=True) as response:
         with open(tar_file, "wb") as f:
             shutil.copyfileobj(response.raw, f)
-        
+
         with tarfile.open(tar_file, "r:xz") as tar:
             tar.extractall(path=os.path.dirname(__file__))
             extracted_folder = tar.getnames()[0]
@@ -134,21 +138,22 @@ def make_wav(
 
     def render2(a, b, vol, pos, knum, note):
         snd_len = int(b)
-        if note in notes_cache:
-            new = notes_cache[note].copy()
-        else:
+        if note not in notes_cache:
             with wave.open(patchpath + fnames[knum][0], "rb") as wf:
                 wl = wf.getnframes()
                 wd = wf.readframes(wl)
-                notes_cache[note] = new = np.array([getval(wd[6 * x : 6 * x + 3]) for x in range(wl // 6)])
+                notes_cache[note] = np.array(
+                    [getval(wd[6 * x : 6 * x + 3]) for x in range(wl // 6)]
+                )
 
+        new = notes_cache[note].copy()
         f = fnames[knum][1]
         if f > 1:
-            x = np.arange(len(new) / f)
-            q = x * f - np.floor(x * f)
-            indices_floor = np.floor(x * f).astype(int)
-            indices_ceil = np.ceil(x * f).astype(int)
-            new2 = (1 - q) * new[indices_floor] + q * new[indices_ceil]
+            f2 = int(len(new) / f)
+            new2 = np.zeros(f2)
+            for x in range(f2):
+                q = x * f - int(x * f)
+                new2[x] = (1 - q) * new[int(x * f)] + q * new[int(x * f) + 1]
         else:
             new2 = new
         raw_note = len(new2)
@@ -209,6 +214,9 @@ def make_wav(
 ##########################################################################
 
 if __name__ == "__main__":
+    from .demosongs import *
+    from .mixfiles import mix_files
+
     print("*** SAMPLER ***")
     print()
     print("Creating Demo Songs... (this might take about a minute)")
