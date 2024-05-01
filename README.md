@@ -1,8 +1,6 @@
 ## Current project status
 
-PySynth is no longer being actively developed by me and has therefore been removed from PyPI.
-
-**There is now a maintained fork of PySynth at [g4brielvs/PySynth](https://github.com/g4brielvs/PySynth).**
+Just a fork that makes use of numpy in all functions, and also adds a new method here and there.
 
 ---
 
@@ -14,30 +12,31 @@ The current release of the synthesizer can only play one note at a time. (Althou
 
 ## Synthesizer scripts
 
-| Synth | Synthesis method | Approximate timbre | Note decay | Needs NumPy? |
-| --- | --- | --- | --- | --- |
-| A | additive (3 sine waves) | flute, organ, piano | variable (depends on note length) | no
-| B | additive (5 sine waves) | acoustic piano | medium | yes
-| C | subtractive (sawtooth wave) | bowed string, analog synth pad | none | no
-| D | subtractive (square wave) | woodwind, analog synth lead | none | no
-| E | FM/phase modulation (6 sine waves) | DX7 Rhodes piano | medium | yes
-| P | subtractive (white noise) | untuned percussion hit | very fast | no
-| S | Karplus-Strong (physical modeling) | plucked string, guitar, koto | fast | yes
-| beeper | additive | Nokia phone ringtone | none | no
-| samp | sampler | [Salamander Grand Piano][3] | medium | yes
+| Synth  | Synthesis method                   | Approximate timbre             | Note decay                        | Needs NumPy? |
+| ------ | ---------------------------------- | ------------------------------ | --------------------------------- | ------------ |
+| A      | additive (3 sine waves)            | flute, organ, piano            | variable (depends on note length) | yes          |
+| B      | additive (5 sine waves)            | acoustic piano                 | medium                            | yes          |
+| C      | subtractive (sawtooth wave)        | bowed string, analog synth pad | none                              | yes          |
+| D      | subtractive (square wave)          | woodwind, analog synth lead    | none                              | yes          |
+| E      | FM/phase modulation (6 sine waves) | DX7 Rhodes piano               | medium                            | yes          |
+| P      | subtractive (white noise)          | untuned percussion hit         | very fast                         | yes          |
+| S      | Karplus-Strong (physical modeling) | plucked string, guitar, koto   | fast                              | yes          |
+| beeper | additive                           | Nokia phone ringtone           | none                              | yes          |
+| samp   | sampler                            | [Salamander Grand Piano][3]    | medium                            | yes          |
 
 ## Installation
 
 ### Linux
+
 Clone the repository:
 
-`git clone git@github.com:mdoege/PySynth.git`
+`git clone git@github.com:Vioshim/PySynth.git`
 
 or
 
-`git clone https://github.com/mdoege/PySynth.git`
+`git clone https://github.com/Vioshim/PySynth.git`
 
-Enter the directory (`cd PySynth`) and run 
+Enter the directory (`cd PySynth`) and run
 
 `python3 setup.py install`
 
@@ -60,15 +59,15 @@ import pysynth_b as psb # a, b, e, and s variants available
 ''' (note, duration)
 Note name (a to g), then optionally a '#' for sharp or
 'b' for flat, then optionally the octave (defaults to 4).
-An asterisk at the end means to play the note a little 
-louder.  Duration: 4 is a quarter note, -4 is a dotted 
+An asterisk at the end means to play the note a little
+louder.  Duration: 4 is a quarter note, -4 is a dotted
 quarter note, etc.'''
 song = (
-  ('c', 4), ('c*', 4), ('eb', 4), 
+  ('c', 4), ('c*', 4), ('eb', 4),
   ('g#', 4),  ('g*', 2), ('g5', 4),
   ('g5*', 4), ('r', 4), ('e5', 16),
   ('f5', 16),  ('e5', 16),  ('d5', 16),
-  ('e5*', 4) 
+  ('e5*', 4)
 )
 
 # Beats per minute (bpm) is really quarters per minute here
