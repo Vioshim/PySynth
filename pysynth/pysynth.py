@@ -35,7 +35,7 @@ from .mkfreq import getfreq
 
 __all__ = ("make_wav",)
 
-pitchhz, keynum = getfreq(pr=True)
+pitchhz, keynum = getfreq()
 
 ##########################################################################
 #### Main program starts below

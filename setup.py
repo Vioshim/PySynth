@@ -13,8 +13,7 @@ with open(REQUIREMENTS_PATH, encoding="utf-8") as f:
 
 setup(
     name="PySynth",
-    author="Martin C. Doege",
-    url="https://github.com/Vioshim/PySynth",
+    author="Martin C. Doege", # original author
     keywords=["music", "piano", "notes"],
     version="2.4.1",
     packages=["pysynth"],
